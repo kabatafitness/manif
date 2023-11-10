@@ -255,6 +255,8 @@ public:
    */
   Jacobian smallAdj() const;
 
+  Jacobian phi() const;
+
   /**
    * @brief Evaluate whether this and v are 'close'.
    * @details This evaluation is performed element-wise.
@@ -620,6 +622,13 @@ typename TangentBase<_Derived>::Jacobian
 TangentBase<_Derived>::smallAdj() const
 {
   return derived().smallAdj();
+}
+
+template <class _Derived>
+typename TangentBase<_Derived>::Jacobian
+TangentBase<_Derived>::phi() const
+{
+    return derived().phi();
 }
 
 template <typename _Derived>

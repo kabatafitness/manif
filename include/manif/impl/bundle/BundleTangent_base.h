@@ -99,6 +99,7 @@ public:
    */
   Jacobian smallAdj() const;
 
+  Jacobian phi() const;
 
   // BundleTangent specific API
 
@@ -138,6 +139,9 @@ protected:
 
   template <int ... _Idx>
   Jacobian smallAdj_impl(internal::intseq<_Idx...>) const;
+
+  template <int ... _Idx>
+  Jacobian phi_impl(internal::intseq<_Idx...>) const;
 };
 
 
@@ -241,6 +245,13 @@ BundleTangentBase<_Derived>::smallAdj() const
 }
 
 template<typename _Derived>
+typename BundleTangentBase<_Derived>::Jacobian
+BundleTangentBase<_Derived>::phi() const
+{
+  return phi_impl(internal::make_intseq_t<BundleSize>{});
+}
+
+template<typename _Derived>
 template<int ... _Idx>
 typename BundleTangentBase<_Derived>::Jacobian
 BundleTangentBase<_Derived>::rjac_impl(internal::intseq<_Idx...>) const
@@ -316,6 +327,23 @@ BundleTangentBase<_Derived>::smallAdj_impl(internal::intseq<_Idx...>) const
       std::get<_Idx>(internal::traits<_Derived>::DoFIdx),
       std::get<_Idx>(internal::traits<_Derived>::DoFIdx)
     ) = element<_Idx>().smallAdj()), 0) ...
+  };
+  static_cast<void>(l);  // compiler warning
+  return Jr;
+}
+
+template<typename _Derived>
+template<int ... _Idx>
+typename BundleTangentBase<_Derived>::Jacobian
+BundleTangentBase<_Derived>::phi_impl(internal::intseq<_Idx...>) const
+{
+  Jacobian Jr = Jacobian::Zero();
+  // c++11 "fold expression"
+  auto l = {
+    ((Jr.template block<Element<_Idx>::DoF, Element<_Idx>::DoF>(
+      std::get<_Idx>(internal::traits<_Derived>::DoFIdx),
+      std::get<_Idx>(internal::traits<_Derived>::DoFIdx)
+    ) = element<_Idx>().phi()), 0) ...
   };
   static_cast<void>(l);  // compiler warning
   return Jr;
