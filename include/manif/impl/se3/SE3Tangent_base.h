@@ -102,6 +102,12 @@ public:
    */
   Jacobian smallAdj() const;
 
+  /**
+   * @brief Calculates phi for LGEKF
+   * @return phi
+   */
+  Jacobian phi() const;
+
   // SE3Tangent specific API
 
   //! @brief Get the linear part.
@@ -316,6 +322,33 @@ SE3TangentBase<_Derived>::smallAdj() const
   smallAdj.template bottomLeftCorner<3,3>().setZero();
 
   return smallAdj;
+}
+
+template <typename _Derived>
+typename SE3TangentBase<_Derived>::Jacobian
+SE3TangentBase<_Derived>::phi() const
+{
+  Jacobian phi;
+  Jacobian adj = smallAdj();
+  //Norm of W
+  Scalar nW = ang().norm();
+  //Cosine and sine of nW
+  Scalar c_nW = cos(nW);
+  Scalar s_nW = sin(nW);
+  phi.setIdentity();
+  /*if (nW != 0) {
+      phi = phi - 1 / (2 * nW * nW) * (4 - nW * s_nW - 4 * c_nW) * adj +
+            1 / (2 * nW * nW * nW) * (4 * nW - 5 * s_nW + nW * c_nW) * adj * adj -
+            1 / (2 * nW * nW * nW * nW) * (2 - nW * s_nW - 2 * c_nW) * adj * adj * adj +
+            1 / (2 * nW * nW * nW * nW * nW) * (2 * nW - 3 * s_nW + nW * c_nW) * adj * adj * adj * adj;
+  }*/
+  if (nW > 0.00001) {
+    phi = phi - 1 / (2 * nW * nW) * (4 - nW * s_nW - 4 * c_nW) * adj +
+      1 / (2 * nW * nW * nW) * (4 * nW - 5 * s_nW + nW * c_nW) * adj * adj -
+      1 / (2 * nW * nW * nW * nW) * (2 - nW * s_nW - 2 * c_nW) * adj * adj * adj +
+      1 / (2 * nW * nW * nW * nW * nW) * (2 * nW - 3 * s_nW + nW * c_nW) * adj * adj * adj * adj;
+  }
+  return phi;
 }
 
 // SE3Tangent specific API

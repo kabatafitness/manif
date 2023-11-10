@@ -96,6 +96,8 @@ public:
    */
   Jacobian smallAdj() const;
 
+  Jacobian phi() const;
+
   // RnTangent specific API
 };
 
@@ -163,6 +165,14 @@ RnTangentBase<_Derived>::smallAdj() const
 {
   static const Jacobian smallAdj = Jacobian::Zero();
   return smallAdj;
+}
+
+template <typename _Derived>
+typename RnTangentBase<_Derived>::Jacobian
+RnTangentBase<_Derived>::phi() const
+{
+  static const Jacobian phi = Jacobian::Identity();
+  return phi;
 }
 
 // RnTangent specific API
