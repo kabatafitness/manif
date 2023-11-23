@@ -15,21 +15,21 @@ namespace internal {
 
 //! Traits specialization
 template<typename _Scalar, template<typename> class ... _T>
-struct traits<BundleTangent<_Scalar, _T...>>
+struct traits<BundleTangent<_Scalar, _T...> >
 {
   // BundleTangent-specific traits
   static constexpr std::size_t BundleSize = sizeof...(_T);
 
   using Elements = std::tuple<typename _T<_Scalar>::Tangent...>;
 
-  template <int _N>
-  using Element = typename std::tuple_element<_N, Elements>::type;
+  template <int _N_>
+  using Element = typename std::tuple_element<_N_, Elements>::type;
 
-  template <int _N>
-  using MapElement = Eigen::Map<Element<_N>>;
+  template <int _N_>
+  using MapElement = Eigen::Map<Element<_N_> >;
 
-  template <int _N>
-  using MapConstElement = Eigen::Map<const Element<_N>>;
+  template <int _N_>
+  using MapConstElement = Eigen::Map<const Element<_N_> >;
 
   static constexpr std::array<int, sizeof...(_T)> DoFIdx = compute_indices<_T<_Scalar>::Tangent::DoF ...>();
   static constexpr std::array<int, sizeof...(_T)> RepSizeIdx = compute_indices<_T<_Scalar>::Tangent::RepSize ...>();
@@ -49,24 +49,21 @@ struct traits<BundleTangent<_Scalar, _T...>>
 
   using DataType = Eigen::Matrix<Scalar, RepSize, 1>;
   using Jacobian = Eigen::Matrix<Scalar, DoF, DoF>;
-  using LieAlg = SquareMatrix<
-    Scalar,
-    accumulate(int(_T<_Scalar>::Tangent::LieAlg::RowsAtCompileTime) ...)
-  >;
+  using LieAlg = Eigen::Matrix<Scalar, DoF, DoF>;
 };
 
 template <typename _Scalar, template<typename> class ... _T>
-const constexpr std::array<int, sizeof...(_T)> traits<BundleTangent<_Scalar, _T ...>>::DoFIdx;
+const constexpr std::array<int, sizeof...(_T)> traits<BundleTangent<_Scalar, _T ...> >::DoFIdx;
 template <typename _Scalar, template<typename> class ... _T>
-const constexpr std::array<int, sizeof...(_T)> traits<BundleTangent<_Scalar, _T ...>>::RepSizeIdx;
+const constexpr std::array<int, sizeof...(_T)> traits<BundleTangent<_Scalar, _T ...> >::RepSizeIdx;
 template <typename _Scalar, template<typename> class ... _T>
-const constexpr std::array<int, sizeof...(_T)> traits<BundleTangent<_Scalar, _T ...>>::AlgIdx;
+const constexpr std::array<int, sizeof...(_T)> traits<BundleTangent<_Scalar, _T ...> >::AlgIdx;
 template <typename _Scalar, template<typename> class ... _T>
-const constexpr int traits<BundleTangent<_Scalar, _T ...>>::Dim;
+const constexpr int traits<BundleTangent<_Scalar, _T ...> >::Dim;
 template <typename _Scalar, template<typename> class ... _T>
-const constexpr int traits<BundleTangent<_Scalar, _T ...>>::DoF;
+const constexpr int traits<BundleTangent<_Scalar, _T ...> >::DoF;
 template <typename _Scalar, template<typename> class ... _T>
-const constexpr int traits<BundleTangent<_Scalar, _T ...>>::RepSize;
+const constexpr int traits<BundleTangent<_Scalar, _T ...> >::RepSize;
 
 }  // namespace internal
 
@@ -78,13 +75,13 @@ const constexpr int traits<BundleTangent<_Scalar, _T ...>>::RepSize;
  * @brief Represents a BundleTangent element.
  */
 template<typename _Scalar, template<typename> class ... _T>
-struct BundleTangent : BundleTangentBase<BundleTangent<_Scalar, _T...>>
+struct BundleTangent : BundleTangentBase<BundleTangent<_Scalar, _T...> >
 {
 private:
 
   static_assert(sizeof...(_T) > 0, "Must have at least one element in BundleTangent !");
 
-  using Base = BundleTangentBase<BundleTangent<_Scalar, _T...>>;
+  using Base = BundleTangentBase<BundleTangent<_Scalar, _T...> >;
   using Type = BundleTangent<_Scalar, _T...>;
 
 protected:

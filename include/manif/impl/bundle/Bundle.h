@@ -3,33 +3,33 @@
 
 #include "manif/impl/bundle/Bundle_base.h"
 #include "manif/impl/traits.h"
+#include "tuple"
 
 namespace manif {
 
 // Forward declare for type traits specialization
 
-template <typename _Scalar, template<typename> class ... _T> struct Bundle;
-template <typename _Scalar, template<typename> class ... _T> struct BundleTangent;
+template <typename _Scalar, template<class> class ... _T> struct Bundle;
+template <typename _Scalar, template<class> class ... _T> struct BundleTangent;
 
 namespace internal {
 
 //! Traits specialization
-template <typename _Scalar, template<typename> class ... _T>
-struct traits<Bundle<_Scalar, _T ...>>
+template <typename _Scalar, template<class> class ... _T>
+struct traits<Bundle<_Scalar, _T ...> >
 {
   // Bundle-specific traits
+  //using Elements = typename std::tuple< _T < _Scalar > ... >;
   static constexpr std::size_t BundleSize = sizeof...(_T);
 
-  using Elements = std::tuple<_T<_Scalar>...>;
+    template <int _N_>
+  using Element = typename std::tuple_element<_N_, std::tuple< _T<_Scalar> ... > >::type;
 
-  template <int _N>
-  using Element = typename std::tuple_element<_N, Elements>::type;
+  template <int _N_>
+  using MapElement = Eigen::Map<Element<_N_> >;
 
-  template <int _N>
-  using MapElement = Eigen::Map<Element<_N>>;
-
-  template <int _N>
-  using MapConstElement = Eigen::Map<const Element<_N>>;
+  template <int _N_>
+  using MapConstElement = Eigen::Map<const Element<_N_> >;
 
   static constexpr std::array<int, sizeof...(_T)> DimIdx = compute_indices<_T<_Scalar>::Dim ...>();
   static constexpr std::array<int, sizeof...(_T)> DoFIdx = compute_indices<_T<_Scalar>::DoF ...>();
@@ -42,7 +42,7 @@ struct traits<Bundle<_Scalar, _T ...>>
   using LieGroup = Bundle<_Scalar, _T ...>;
   using Tangent = BundleTangent<_Scalar, _T ...>;
 
-  using Base = BundleBase<Bundle<_Scalar, _T ...>>;
+  using Base = BundleBase<Bundle<_Scalar, _T ...> >;
 
   static constexpr int Dim = accumulate(int(_T<_Scalar>::Dim) ...);
   static constexpr int DoF = accumulate(int(_T<_Scalar>::DoF) ...);
@@ -52,25 +52,25 @@ struct traits<Bundle<_Scalar, _T ...>>
   using Jacobian = Eigen::Matrix<_Scalar, DoF, DoF>;
   using Transformation = SquareMatrix<
     _Scalar,
-    accumulate(int(_T<_Scalar>::Transformation::RowsAtCompileTime) ...)
+    RepSize
   >;
   using Vector = Eigen::Matrix<_Scalar, Dim, 1>;
 };
 
 template <typename _Scalar, template<typename> class ... _T>
-const constexpr std::array<int, sizeof...(_T)> traits<Bundle<_Scalar, _T ...>>::DimIdx;
+const constexpr std::array<int, sizeof...(_T)> traits<Bundle<_Scalar, _T ...> >::DimIdx;
 template <typename _Scalar, template<typename> class ... _T>
-const constexpr std::array<int, sizeof...(_T)> traits<Bundle<_Scalar, _T ...>>::DoFIdx;
+const constexpr std::array<int, sizeof...(_T)> traits<Bundle<_Scalar, _T ...> >::DoFIdx;
 template <typename _Scalar, template<typename> class ... _T>
-const constexpr std::array<int, sizeof...(_T)> traits<Bundle<_Scalar, _T ...>>::RepSizeIdx;
+const constexpr std::array<int, sizeof...(_T)> traits<Bundle<_Scalar, _T ...> >::RepSizeIdx;
 template <typename _Scalar, template<typename> class ... _T>
-const constexpr std::array<int, sizeof...(_T)> traits<Bundle<_Scalar, _T ...>>::TraIdx;
+const constexpr std::array<int, sizeof...(_T)> traits<Bundle<_Scalar, _T ...> >::TraIdx;
 template <typename _Scalar, template<typename> class ... _T>
-const constexpr int traits<Bundle<_Scalar, _T ...>>::Dim;
+const constexpr int traits<Bundle<_Scalar, _T ...> >::Dim;
 template <typename _Scalar, template<typename> class ... _T>
-const constexpr int traits<Bundle<_Scalar, _T ...>>::DoF;
+const constexpr int traits<Bundle<_Scalar, _T ...> >::DoF;
 template <typename _Scalar, template<typename> class ... _T>
-const constexpr int traits<Bundle<_Scalar, _T ...>>::RepSize;
+const constexpr int traits<Bundle<_Scalar, _T ...> >::RepSize;
 
 }  // namespace internal
 
@@ -94,14 +94,14 @@ const constexpr int traits<Bundle<_Scalar, _T ...>>::RepSize;
  *
  *   > Bundle<double, SO3, R3, R3> element;
  */
-template<typename _Scalar, template<typename> class ... _T>
-struct Bundle : BundleBase<Bundle<_Scalar, _T ...>>
+template<typename _Scalar, template<class> class ... _T>
+struct Bundle : BundleBase<Bundle<_Scalar, _T ...> >
 {
 private:
 
   static_assert(sizeof...(_T) > 0, "Must have at least one element in Bundle !");
 
-  using Base = BundleBase<Bundle<_Scalar, _T...>>;
+  using Base = BundleBase<Bundle<_Scalar, _T...> >;
   using Type = Bundle<_Scalar, _T...>;
 
 protected:

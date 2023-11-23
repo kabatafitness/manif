@@ -99,9 +99,11 @@ public:
    */
   Jacobian smallAdj() const;
 
+
   Jacobian phi() const;
 
-  // BundleTangent specific API
+
+    // BundleTangent specific API
 
   /**
    * @brief Access BundleTangent element as Map
@@ -142,6 +144,7 @@ protected:
 
   template <int ... _Idx>
   Jacobian phi_impl(internal::intseq<_Idx...>) const;
+
 };
 
 
@@ -248,7 +251,7 @@ template<typename _Derived>
 typename BundleTangentBase<_Derived>::Jacobian
 BundleTangentBase<_Derived>::phi() const
 {
-  return phi_impl(internal::make_intseq_t<BundleSize>{});
+    return phi_impl(internal::make_intseq_t<BundleSize>{});
 }
 
 template<typename _Derived>
@@ -332,22 +335,22 @@ BundleTangentBase<_Derived>::smallAdj_impl(internal::intseq<_Idx...>) const
   return Jr;
 }
 
-template<typename _Derived>
-template<int ... _Idx>
-typename BundleTangentBase<_Derived>::Jacobian
-BundleTangentBase<_Derived>::phi_impl(internal::intseq<_Idx...>) const
-{
-  Jacobian Jr = Jacobian::Zero();
-  // c++11 "fold expression"
-  auto l = {
-    ((Jr.template block<Element<_Idx>::DoF, Element<_Idx>::DoF>(
-      std::get<_Idx>(internal::traits<_Derived>::DoFIdx),
-      std::get<_Idx>(internal::traits<_Derived>::DoFIdx)
-    ) = element<_Idx>().phi()), 0) ...
-  };
-  static_cast<void>(l);  // compiler warning
-  return Jr;
-}
+    template<typename _Derived>
+    template<int ... _Idx>
+    typename BundleTangentBase<_Derived>::Jacobian
+    BundleTangentBase<_Derived>::phi_impl(internal::intseq<_Idx...>) const
+    {
+        Jacobian Jr = Jacobian::Zero();
+        // c++11 "fold expression"
+        auto l = {
+                ((Jr.template block<Element<_Idx>::DoF, Element<_Idx>::DoF>(
+                        std::get<_Idx>(internal::traits<_Derived>::DoFIdx),
+                        std::get<_Idx>(internal::traits<_Derived>::DoFIdx)
+                ) = element<_Idx>().phi()), 0) ...
+        };
+        static_cast<void>(l);  // compiler warning
+        return Jr;
+    }
 
 template<typename _Derived>
 template<int _Idx>
@@ -394,7 +397,7 @@ struct GeneratorEvaluator<BundleTangentBase<Derived>>
   run(const unsigned int i, intseq<_Idx...>)
   {
     using LieAlg = typename BundleTangentBase<Derived>::LieAlg;
-    LieAlg Ei = LieAlg::Zero();
+    LieAlg Ei = LieAlg::Constant(0);
     // c++11 "fold expression"
     auto l = {((Ei.template block<
       Derived::template Element<_Idx>::LieAlg::RowsAtCompileTime,

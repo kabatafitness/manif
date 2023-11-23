@@ -24,7 +24,7 @@ public:
    */
   static constexpr std::size_t BundleSize = internal::traits<_Derived>::BundleSize;
 
-  using Elements = typename internal::traits<_Derived>::Elements;
+  //using Elements = typename internal::traits<_Derived>::Elements;
 
   template <int Idx>
   using Element = typename internal::traits<_Derived>::template Element<Idx>;
@@ -99,8 +99,8 @@ public:
    */
   Vector act(
     const Vector & v,
-    tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, DoF>>> J_vout_m = {},
-    tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, Dim>>> J_vout_v = {}
+    tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, DoF> > > J_vout_m = {},
+    tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, Dim> > > J_vout_v = {}
   ) const;
 
   /**
@@ -149,8 +149,8 @@ protected:
   template<int ... _Idx>
   Vector act_impl(
     const Vector & v,
-    tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, DoF>>> J_vout_m,
-    tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, Dim>>> J_vout_v,
+    tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, DoF> > > J_vout_m,
+    tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, Dim> > > J_vout_v,
     internal::intseq<_Idx...>
   ) const;
 
@@ -298,7 +298,7 @@ BundleBase<_Derived>::compose_impl(
           std::get<_Idx>(internal::traits<_Derived>::DoFIdx)
         ) :
         tl::optional<
-          Eigen::Ref<Eigen::Matrix<Scalar, Element<_Idx>::DoF, Element<_Idx>::DoF>>
+          Eigen::Ref<Eigen::Matrix<Scalar, Element<_Idx>::DoF, Element<_Idx>::DoF> >
         >{},
       J_mc_mb ?
         J_mc_mb->template block<
@@ -308,7 +308,7 @@ BundleBase<_Derived>::compose_impl(
           std::get<_Idx>(internal::traits<_Derived>::DoFIdx)
         ) :
         tl::optional<
-          Eigen::Ref<Eigen::Matrix<Scalar, Element<_Idx>::DoF, Element<_Idx>::DoF>>
+          Eigen::Ref<Eigen::Matrix<Scalar, Element<_Idx>::DoF, Element<_Idx>::DoF> >
         >{}
     ) ...
   );
@@ -318,8 +318,8 @@ template<typename _Derived>
 typename BundleBase<_Derived>::Vector
 BundleBase<_Derived>::act(
   const typename BundleBase<_Derived>::Vector & v,
-  tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, DoF>>> J_vout_m,
-  tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, Dim>>> J_vout_v) const
+  tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, DoF> > > J_vout_m,
+  tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, Dim> > > J_vout_v) const
 {
   if (J_vout_m) {
     J_vout_m->setZero();
@@ -336,8 +336,8 @@ template<int ... _Idx>
 typename BundleBase<_Derived>::Vector
 BundleBase<_Derived>::act_impl(
   const typename BundleBase<_Derived>::Vector & v,
-  tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, DoF>>> J_vout_m,
-  tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, Dim>>> J_vout_v,
+  tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, DoF> > > J_vout_m,
+  tl::optional<Eigen::Ref<Eigen::Matrix<Scalar, Dim, Dim> > > J_vout_v,
   internal::intseq<_Idx...>
 ) const {
   Vector ret;
@@ -354,7 +354,7 @@ BundleBase<_Derived>::act_impl(
         std::get<_Idx>(internal::traits<_Derived>::DoFIdx)
       ) :
       tl::optional<
-        Eigen::Ref<Eigen::Matrix<Scalar, Element<_Idx>::Dim, Element<_Idx>::DoF>>
+        Eigen::Ref<Eigen::Matrix<Scalar, Element<_Idx>::Dim, Element<_Idx>::DoF> >
       >{},
       J_vout_v ?
         J_vout_v->template block<Element<_Idx>::Dim, Element<_Idx>::Dim>(
@@ -362,7 +362,7 @@ BundleBase<_Derived>::act_impl(
           std::get<_Idx>(internal::traits<_Derived>::DimIdx)
         ) :
         tl::optional<
-          Eigen::Ref<Eigen::Matrix<Scalar, Element<_Idx>::Dim, Element<_Idx>::Dim>>
+          Eigen::Ref<Eigen::Matrix<Scalar, Element<_Idx>::Dim, Element<_Idx>::Dim> >
         >{}
     )
   ), 0) ...};
@@ -420,7 +420,7 @@ namespace internal {
  * @brief Random specialization for Bundle objects.
  */
 template<typename Derived>
-struct RandomEvaluatorImpl<BundleBase<Derived>>
+struct RandomEvaluatorImpl<BundleBase<Derived> >
 {
   static void run(BundleBase<Derived> & m)
   {
